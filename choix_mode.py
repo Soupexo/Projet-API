@@ -7,7 +7,7 @@ import subprocess
 root=Tk()
 root.attributes("-fullscreen", True)
 root.title("Tabemono Game")
-bg1= Image.open("choix mode.png")
+bg1= Image.open("images/choix mode.png")
 bg2= bg1.rotate(90)
 fichier_a_executer1 = 'quizz.py'
 fichier_a_executer2 = "recipe.py"

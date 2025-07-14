@@ -7,9 +7,9 @@ root=Tk()
 root.title("Tabemono Game")
 
 root.attributes("-fullscreen", True)
-fichier_a_executer1 = 'choix_mode.py'
+fichier_a_executer1 = 'images/choix_mode.py'
 
-bg= Image.open("page d'accueil.png")
+bg= Image.open("images/page d'accueil.png")
 
 resize_image = bg.resize((1600, 1080))
 ph = ImageTk.PhotoImage(resize_image)
