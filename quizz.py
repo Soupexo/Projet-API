@@ -30,7 +30,7 @@ def Relance():
 
     largeur = 500
     hauteur = 500
-    image_redimensionnee = image.resize((largeur, hauteur), Image.ANTIALIAS)
+    image_redimensionnee = image.resize((largeur, hauteur), Image.Resampling.LANCZOS)
     img.paste(image_redimensionnee)
     label_image.configure(image=img)
     print(choix_plat)
@@ -111,7 +111,8 @@ image = Image.open(io.BytesIO(image_data))
 
 largeur = 500
 hauteur = 500
-image_redimensionnee = image.resize((largeur, hauteur), Image.ANTIALIAS)
+image_redimensionnee = image.resize((largeur, hauteur), Image.Resampling.LANCZOS)
+
 img=ImageTk.PhotoImage(image_redimensionnee)
 label_image = Label(root, image=img)
 
