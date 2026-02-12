@@ -39,7 +39,7 @@ def affichage():
         plat = liste_plat.get(affiche)
         print(plat)
         url = f"https://www.themealdb.com/api/json/v1/1/search.php?s={plat}"
-        reponse = requests.get(url, verify=False)
+        reponse = requests.get(url)
 
         #Vérification du succès de la requête et affichage de la recette du plat sélectionné
         if reponse.status_code == 200:
