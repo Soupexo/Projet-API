@@ -3,6 +3,8 @@ from tkinter import *
 from PIL import Image, ImageTk
 from io import BytesIO
 
+# Il faut double cliquer sur les labels images pour faire défiler et continuer à jouer.
+
 #Définition de la fonction qui va génerer deux plats aléatoirement sous forme de dictionnaire
 def plat_aleatoire():
 
