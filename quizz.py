@@ -1,166 +1,181 @@
-from io import BytesIO
-from tkinter import*
-from random import*
+from tkinter import *
+from random import choice, randint
 from PIL import Image, ImageTk
 import urllib.request
 import io
 
+# ---------------------------
+# DONNEES
+# ---------------------------
+
+menu = {
+    "biryani": 81,
+    "burger": 87,
+    "butter-chicken": 22,
+    "dessert": 36,
+    "dosa": 83,
+    "idly": 77,
+    "pasta": 34,
+    "pizza": 95,
+    "rice": 35,
+    "samosa": 22
+}
+
+plat = list(menu.keys())
+
+point = 0
+cpt = 0
+bonne_reponse = ""
+img = None
 
 
+# ---------------------------
+# FONCTIONS
+# ---------------------------
+
+def charger_image():
+    global bonne_reponse, img
+
+    bonne_reponse = choice(plat)
+    num = randint(1, menu[bonne_reponse])
+
+    url = f"https://foodish-api.com/images/{bonne_reponse}/{bonne_reponse}{num}.jpg"
+
+    try:
+        with urllib.request.urlopen(url) as response:
+            image_data = response.read()
+
+        image = Image.open(io.BytesIO(image_data))
+        image = image.resize((400, 400), Image.LANCZOS)
+
+        img = ImageTk.PhotoImage(image)
+        label_image.config(image=img)
+
+    except:
+        charger_image()
 
 
+def generer_choix():
+    choix = plat.copy()
+    choix.remove(bonne_reponse)
 
-def Relance():
-    global menu,plat
-    plat_aleatoire=choice(plat)
-    entier_aleatoire=randint(1,menu[plat_aleatoire])
-    p=list(plat)
-    p.remove(plat_aleatoire)
-    p1=choice(p)
-    p.remove(p1)
-    p2=choice(p)
-    choix_plat=[p2,p1,plat_aleatoire]
+    faux1 = choice(choix)
+    choix.remove(faux1)
 
-    url="https://foodish-api.com/images/"+plat_aleatoire+"/"+plat_aleatoire+str(entier_aleatoire)+".jpg"
+    faux2 = choice(choix)
 
-    with urllib.request.urlopen(url) as response:
-        image_data = response.read()
-    image = Image.open(io.BytesIO(image_data))
+    boutons = [bonne_reponse, faux1, faux2]
+
+    # mélanger
+    from random import shuffle
+    shuffle(boutons)
+
+    Bouton1.config(text=boutons[0], command=lambda: verifier(boutons[0]))
+    Bouton2.config(text=boutons[1], command=lambda: verifier(boutons[1]))
+    Bouton3.config(text=boutons[2], command=lambda: verifier(boutons[2]))
 
 
-    largeur = 500
-    hauteur = 500
-    image_redimensionnee = image.resize((largeur, hauteur), Image.LANCZOS)
-    img.paste(image_redimensionnee)
-    label_image.configure(image=img)
-    print(choix_plat)
+def verifier(reponse):
+    global point, cpt
 
-    txt_1=choice(choix_plat)
-    if txt_1==plat_aleatoire:
-        Bouton1.config(command=Trouvé)
+    cpt += 1
+
+    if reponse == bonne_reponse:
+        point += 1
+        resultat.config(text="✔ Bonne réponse !", fg="#2ECC71")
     else:
-        Bouton1.config(command=Perdu)
+        resultat.config(text=f"✘ Mauvaise réponse ! ({bonne_reponse})", fg="#E74C3C")
 
-    Bouton1.config(text=txt_1)
-    choix_plat.remove(txt_1)
+    Score.config(text=f"Points : {point} / {cpt}")
 
-    txt_2=choice(choix_plat)
-    if txt_2==plat_aleatoire:
-        Bouton2.config(command=Trouvé)
-    else:
-        Bouton2.config(command=Perdu)
-
-    Bouton2.config(text=txt_2)
-    choix_plat.remove(txt_2)
+    root.after(1500, nouvelle_question)
 
 
-    txt_3=choix_plat[0]
-    Bouton3.config(text=txt_3)
-    if txt_3==plat_aleatoire:
-        Bouton3.config(command=Trouvé)
-    else:
-        Bouton3.config(command=Perdu)
-def Trouvé():
-    global point,cpt
-    point+=1
-    cpt+=1
-    Score.config(text="Points : "+str(point)+"/"+str(cpt))
-    Relance()
-def Perdu():
-    global cpt
-    cpt+=1
-    Score.config(text="Points : "+str(point)+"/"+str(cpt))
-    Relance()
+def nouvelle_question():
+    resultat.config(text="")
+    charger_image()
+    generer_choix()
 
 
+# ---------------------------
+# INTERFACE
+# ---------------------------
+
+root = Tk()
+root.title("Quiz Food")
+root.geometry("700x800")
+root.configure(bg="#2C3E50")
 
 
-root=Tk()
-root.geometry("1000x1000")
-menu={"biryani" : 81,
-"burger" : 87,
-"butter-chicken" : 22,
-"dessert" : 36,
-"dosa" : 83,
-"idly" : 77,
-"pasta" : 34,
-"pizza" : 95,
-"rice" : 35,
-"samosa" : 22}
-point=0
-cpt=0
-
-plat=list(menu.keys())
-plat_aleatoire=choice(plat)
-entier_aleatoire=randint(1,menu[plat_aleatoire])
-p=list(plat)
-p.remove(plat_aleatoire)
-p1=choice(p)
-p.remove(p1)
-p2=choice(p)
-choix_plat=[p2,p1,plat_aleatoire]
-
-url="https://foodish-api.com/images/"+plat_aleatoire+"/"+plat_aleatoire+str(entier_aleatoire)+".jpg"
-print(url)
-with urllib.request.urlopen(url) as response:
-        image_data = response.read()
-
-# Ouvrir l'image avec PIL
-image = Image.open(io.BytesIO(image_data))
+# TITRE
+Titre = Label(
+    root,
+    text="DEVINEZ LE PLAT 🍽",
+    font=("Arial", 28, "bold"),
+    bg="#2C3E50",
+    fg="white"
+)
+Titre.pack(pady=20)
 
 
-largeur = 500
-hauteur = 500
-image_redimensionnee = image.resize((largeur, hauteur), Image.LANCZOS)
-
-img=ImageTk.PhotoImage(image_redimensionnee)
-label_image = Label(root, image=img)
-
-
-Titre= Label(root, text="Devinez le plat !",font=("Arial",30))
-Titre.pack()
-
-Score= Label(root, text="Points : "+str(point)+"/"+str(cpt),font=("Arial", 20))
-Score.pack()
-
-label_image.place(x=(root.winfo_width() - label_image.winfo_width()) // 2, y=(root.winfo_height() - label_image.winfo_height()) // 2)
-label_image.pack()
-
-cadre_boutons = Frame(root)
-cadre_boutons.pack()
-txt_1=choice(choix_plat)
-if txt_1==plat_aleatoire:
-
-    Bouton1 = Button(cadre_boutons, text=txt_1, font=("Arial", 20),command=Trouvé)
-    Bouton1.pack(side=LEFT, padx=10)
-else:
-    Bouton1 = Button(cadre_boutons, text=txt_1, font=("Arial", 20),command=Perdu)
-    Bouton1.pack(side=LEFT, padx=10)
-
-choix_plat.remove(txt_1)
-txt_2=choice(choix_plat)
-
-if txt_2==plat_aleatoire:
-
-    Bouton2 = Button(cadre_boutons, text=txt_2, font=("Arial", 20),command=Trouvé)
-    Bouton2.pack(side=LEFT, padx=10)
-else:
-    Bouton2 = Button(cadre_boutons, text=txt_2, font=("Arial", 20),command=Perdu)
-    Bouton2.pack(side=LEFT, padx=10)
-
-choix_plat.remove(txt_2)
-txt_3=choix_plat[0]
-if txt_3==plat_aleatoire:
-
-    Bouton3 = Button(cadre_boutons, text=txt_3, font=("Arial", 20),command=Trouvé)
-    Bouton3.pack(side=LEFT, padx=10)
-else:
-    Bouton3 = Button(cadre_boutons, text=txt_3, font=("Arial", 20),command=Perdu)
-    Bouton3.pack(side=LEFT, padx=10)
+# SCORE
+Score = Label(
+    root,
+    text="Points : 0 / 0",
+    font=("Arial", 18),
+    bg="#2C3E50",
+    fg="#1ABC9C"
+)
+Score.pack(pady=10)
 
 
+# CADRE IMAGE
+cadre_image = Frame(root, bg="white", bd=3, relief=RIDGE)
+cadre_image.pack(pady=20)
 
-choix_plat.remove(txt_3)
+label_image = Label(cadre_image, bg="white")
+label_image.pack(padx=10, pady=10)
 
+
+# RESULTAT
+resultat = Label(
+    root,
+    text="",
+    font=("Arial", 16, "bold"),
+    bg="#2C3E50"
+)
+resultat.pack(pady=10)
+
+
+# CADRE BOUTONS
+cadre_boutons = Frame(root, bg="#2C3E50")
+cadre_boutons.pack(pady=30)
+
+
+# STYLE BOUTONS
+style_bouton = {
+    "font": ("Arial", 16, "bold"),
+    "width": 15,
+    "height": 2,
+    "bg": "#34495E",
+    "fg": "white",
+    "activebackground": "#1ABC9C",
+    "activeforeground": "black",
+    "bd": 0,
+    "cursor": "hand2"
+}
+
+Bouton1 = Button(cadre_boutons, **style_bouton)
+Bouton1.grid(row=0, column=0, padx=15, pady=10)
+
+Bouton2 = Button(cadre_boutons, **style_bouton)
+Bouton2.grid(row=0, column=1, padx=15, pady=10)
+
+Bouton3 = Button(cadre_boutons, **style_bouton)
+Bouton3.grid(row=0, column=2, padx=15, pady=10)
+
+
+# DEMARRAGE
+nouvelle_question()
 
 root.mainloop()
